@@ -70,7 +70,7 @@ def dump_chainstate():
             # batch db append:
             if len(utxo_set) % cfg.BATCH_SIZE == 0:
                 logger.info(f'Saving a batch of {len(utxo_set)} rows to db...')
-                hp.write_to_db(utxo_set, cfg.OUTPUT_FORMAT)
+                hp.write_to_db(utxo_set)
                 utxo_set = []
 
         idx += 1
@@ -78,7 +78,7 @@ def dump_chainstate():
             break
     if len(utxo_set) > 0:
         logger.info(f'Saving {len(utxo_set)} rows to db...')
-        hp.write_to_db(utxo_set, cfg.OUTPUT_FORMAT)
+        hp.write_to_db(utxo_set)
     db.close()
 
 

@@ -5,10 +5,7 @@ from fastparquet import write
 from pathlib import Path
 
 
-def write_to_db(obj_list, output):
-    '''
-        output: parquet/sqlite/both
-    '''
+def write_to_db(obj_list):
     nop = 'no_partition'
     df = DataFrame([o.__dict__ for o in obj_list])
     if cfg.PARTITION: 
@@ -18,14 +15,14 @@ def write_to_db(obj_list, output):
         partition_by = nop
     for partition, gdf in df.groupby(partition_by):
         fname = partition if cfg.PARTITION else 'chainstate'
-        if output.lower() in ['sqlite', 'both']:
+        if cfg.OUTPUT_FORMAT.lower() in ['sqlite', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{fname}.sqlite')
             conn = sqlite3.connect(f)
             if not cfg.PARTITION: del gdf[nop]
             gdf.to_sql(f'{fname}', conn, if_exists='append', index=False)
             conn.commit()
             conn.close()
-        if output.lower() in ['parquet', 'both']:
+        if cfg.OUTPUT_FORMAT.lower() in ['parquet', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{fname}.parquet')
             if not cfg.PARTITION: del gdf[nop]
             write(f, gdf, compression='snappy', append=f.is_file())
