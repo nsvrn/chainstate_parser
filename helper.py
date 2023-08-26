@@ -9,23 +9,24 @@ def write_to_db(obj_list, output):
     '''
         output: parquet/sqlite/both
     '''
+    nop = 'no_partition'
     df = DataFrame([o.__dict__ for o in obj_list])
-    if not cfg.PARTITION: 
+    if cfg.PARTITION: 
         partition_by = 'script_type'
     else:
-        df['no_partition'] = 'chainstate'
-        partition_by = 'no_partition'
+        df[nop] = '0'
+        partition_by = nop
     for partition, gdf in df.groupby(partition_by):
         if output.lower() in ['sqlite', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{partition}.sqlite')
             conn = sqlite3.connect(f)
-            del gdf['no_partition']
+            if not cfg.PARTITION: del gdf[nop]
             gdf.to_sql(f'{partition}', conn, if_exists='append', index=False)
             conn.commit()
             conn.close()
         if output.lower() in ['parquet', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{partition}.parquet')
-            del gdf['no_partition']
+            if not cfg.PARTITION: del gdf[nop]
             write(f, gdf, compression='snappy', append=f.is_file())
     
 
