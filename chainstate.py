@@ -43,7 +43,7 @@ def deobfuscate(key, value):
     return bytes.fromhex(dv)
 
 
-def parse_chainstate():
+def dump_chainstate():
     db = get_db()
     obf_key = get_obfuscation_key(db)
     idx = 0
@@ -66,6 +66,12 @@ def parse_chainstate():
             script_type, script_pubkey = script.decompress(nsize, d_value[offset:])   
             utxo_set.append(UTXO(tx_id, vout, height, is_coinbase, amount, 
                                     script_type, script_pubkey.__repr__()))
+            
+            # batch db append:
+            if len(utxo_set) % cfg.BATCH_SIZE == 0:
+                logger.info(f'Saving a batch of {len(utxo_set)} rows to db...')
+                hp.write_to_db(utxo_set, cfg.OUTPUT_FORMAT)
+                utxo_set = []
 
         idx += 1
         if cfg.MAX_ROWS and idx >= cfg.MAX_ROWS:
@@ -76,9 +82,18 @@ def parse_chainstate():
     db.close()
 
 
+def purge_old_output_files():
+    logger.info('Purging old files...')
+    for fname in [cfg.PARQUET_FNAME, cfg.SQLITE_FNAME]:
+        f = Path(fname)
+        f.unlink(missing_ok=True)
+
+
 
 if __name__ == '__main__':
     set_logger('DEBUG') 
-    parse_chainstate()
+
+    purge_old_output_files()
+    dump_chainstate()
     pass
 

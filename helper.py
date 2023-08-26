@@ -1,5 +1,8 @@
 from pandas import DataFrame
 import sqlite3
+import config as cfg
+from fastparquet import write
+from pathlib import Path
 
 
 def write_to_db(obj_list, output):
@@ -8,12 +11,13 @@ def write_to_db(obj_list, output):
     '''
     df = DataFrame([o.__dict__ for o in obj_list])
     if output.lower() in ['sqlite', 'both']:
-        conn = sqlite3.connect('chainstate.sqlite')
-        df.to_sql('chainstate', conn, if_exists='replace', index=False)
+        conn = sqlite3.connect(cfg.SQLITE_FNAME)
+        df.to_sql('chainstate', conn, if_exists='append', index=False)
         conn.commit()
         conn.close()
     if output.lower() in ['parquet', 'both']:
-        df.to_parquet('chainstate.parquet', engine='pyarrow')
+        fp = Path(cfg.PARQUET_FNAME)
+        write(cfg.PARQUET_FNAME, df, append=fp.is_file())
     
 
 def read_varint(buf, offset=0):

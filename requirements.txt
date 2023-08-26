@@ -5,3 +5,4 @@ python-bitcoinlib # script parsing
 base58 # encoding
 tqdm # progress bar
 pyarrow # parquet format
+fastparquet # parquet engine for appending
