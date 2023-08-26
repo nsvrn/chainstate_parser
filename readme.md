@@ -12,3 +12,9 @@ Required: >= python3.7
 - Run `python chainstate.py`
 - The parsed data will be saved down in chainstate.sqlite
 - You can load it back in python/dataframes or use [SQLite browser](https://sqlitebrowser.org/) to query
+
+
+#### References:
+- https://github.com/in3rsha/bitcoin-chainstate-parser
+- https://github.com/proger/utxo-dump
+- https://github.com/jimmysong/programmingbitcoin
