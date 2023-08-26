@@ -12,8 +12,8 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 - Shutdown bitcoind and copy chainstate folder inside this package folder
 - Setup config.py settings (refer config section below)
 - Run `python chainstate.py`
-- The parsed data will be saved down in chainstate.sqlite
-- You can load it back in python/dataframes or use [SQLite browser](https://sqlitebrowser.org/) to query
+- The parsed data can be saved down to a single sqlite table or a single parquet file
+- You can load it back in python/dataframes or use [SQLite browser](https://sqlitebrowser.org/) for sqlite to query
 
 #### Config.py
 > **Warning**: processing time: ~110M leveldb rows, parses at ~10k rows/second
