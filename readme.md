@@ -1,3 +1,9 @@
+#### Chainstate Parser
+Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite table
+
+![alt screenshot](chainstate_screenshot.png)
+
+
 #### Setup
 Required: >= python3.7
 
