@@ -5,26 +5,35 @@ from fastparquet import write
 from pathlib import Path
 
 
-def write_to_db(obj_list):
-    nop = 'no_partition'
-    df = DataFrame([o.__dict__ for o in obj_list])
-    if cfg.PARTITION: 
+def write_to_db(obj_list, is_txids=False):
+    is_partition = cfg.PARTITION
+    db_name = 'chainstate'
+    if is_txids: 
+        is_partition = False
+        db_name = 'txid'
+        obj_list.pop('NA', None)
+        df = DataFrame(obj_list.items(), columns=['tx_id', 'txid_key'])
+    else:
+        df = DataFrame([o.__dict__ for o in obj_list])
+    
+    if is_partition: 
         partition_by = 'script_type'
     else:
-        df[nop] = '0'
-        partition_by = nop
+        df['__x'] = 1
+        partition_by = '__x'
+    
     for partition, gdf in df.groupby(partition_by):
-        fname = partition if cfg.PARTITION else 'chainstate'
+        fname = partition if is_partition else db_name
         if cfg.OUTPUT_FORMAT.lower() in ['sqlite', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{fname}.sqlite')
             conn = sqlite3.connect(f)
-            if not cfg.PARTITION: del gdf[nop]
+            if partition_by in gdf.columns: del gdf[partition_by]
             gdf.to_sql(f'{fname}', conn, if_exists='append', index=False)
             conn.commit()
             conn.close()
         if cfg.OUTPUT_FORMAT.lower() in ['parquet', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{fname}.parquet')
-            if not cfg.PARTITION: del gdf[nop]
+            if partition_by in gdf.columns: del gdf[partition_by]
             write(f, gdf, compression='snappy', append=f.is_file())
     
 

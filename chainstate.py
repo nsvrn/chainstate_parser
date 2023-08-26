@@ -10,7 +10,8 @@ import config as cfg
 
 @dataclass
 class UTXO:
-    tx_id: str
+    if cfg.NORMALIZATION: txid_key: int
+    else: tx_id: str
     vout: str
     height: int
     is_coinbase: int
@@ -48,11 +49,14 @@ def dump_chainstate():
     obf_key = get_obfuscation_key(db)
     idx = 0
     utxo_set = []
+    txid_dict = {'NA':0}
     logger.info('Parsing in progress...')
     for key, value in tqdm(db.iterator()):
         if chr(key[0]) == 'C':
             # parse key:
             tx_id = (key[1:33][::-1]).hex()
+            if cfg.NORMALIZATION and tx_id not in txid_dict:
+                txid_dict[tx_id] = max(txid_dict.values()) + 1
             vout = hp.read_varint(key[33:])[0]
             
             # parse value:
@@ -64,7 +68,8 @@ def dump_chainstate():
             amount = hp.txout_decompressamount(amount)
             nsize, offset = hp.read_varint(d_value, offset)
             script_type, script_pubkey = script.decompress(nsize, d_value[offset:])   
-            utxo_set.append(UTXO(tx_id, vout, height, is_coinbase, amount, 
+            tx_key = txid_dict[tx_id] if cfg.NORMALIZATION else tx_id
+            utxo_set.append(UTXO(tx_key, vout, height, is_coinbase, amount, 
                                     script_type, script_pubkey.__repr__()))
             
             # batch db append:
@@ -79,6 +84,8 @@ def dump_chainstate():
     if len(utxo_set) > 0:
         logger.info(f'Saving {len(utxo_set)} rows to db...')
         hp.write_to_db(utxo_set)
+        if cfg.NORMALIZATION:
+            hp.write_to_db(txid_dict, is_txids=True)
     db.close()
 
 
