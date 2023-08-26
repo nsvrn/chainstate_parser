@@ -1,6 +1,7 @@
-loguru
-plyvel
-pandas
-python-bitcoinlib
-base58
-tqdm
+loguru # logging
+plyvel # leveldb
+pandas # dataframe
+python-bitcoinlib # script parsing
+base58 # encoding
+tqdm # progress bar
+pyarrow # parquet format

@@ -2,12 +2,19 @@ from pandas import DataFrame
 import sqlite3
 
 
-def write_to_db(obj_list):
+def write_to_db(obj_list, output):
+    '''
+        output: parquet/sqlite/both
+    '''
     df = DataFrame([o.__dict__ for o in obj_list])
-    conn = sqlite3.connect('chainstate.sqlite')
-    df.to_sql('chainstate', conn, if_exists='replace', index=False)
-    conn.commit()
-    conn.close()
+    if output.lower() in ['sqlite', 'both']:
+        conn = sqlite3.connect('chainstate.sqlite')
+        df.to_sql('chainstate', conn, if_exists='replace', index=False)
+        conn.commit()
+        conn.close()
+    if output.lower() in ['parquet', 'both']:
+        df.to_parquet('chainstate.parquet', engine='pyarrow')
+    
 
 def read_varint(buf, offset=0):
     '''

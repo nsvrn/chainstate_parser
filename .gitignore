@@ -2,3 +2,5 @@
 **/__pycache__
 *.sqlite
 *.csv
+*.parquet
+scratchpad.py

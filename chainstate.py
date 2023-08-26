@@ -5,6 +5,7 @@ from pathlib import Path
 import helper as hp
 from dataclasses import dataclass
 import script 
+import config as cfg
 
 
 @dataclass
@@ -67,11 +68,11 @@ def parse_chainstate():
                                     script_type, script_pubkey.__repr__()))
 
         idx += 1
-        if idx >= int(10e6):
+        if cfg.MAX_ROWS and idx >= cfg.MAX_ROWS:
             break
     if len(utxo_set) > 0:
         logger.info(f'Saving {len(utxo_set)} rows to db...')
-        hp.write_to_db(utxo_set)
+        hp.write_to_db(utxo_set, cfg.OUTPUT_FORMAT)
     db.close()
 
 
