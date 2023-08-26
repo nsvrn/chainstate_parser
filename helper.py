@@ -10,14 +10,23 @@ def write_to_db(obj_list, output):
         output: parquet/sqlite/both
     '''
     df = DataFrame([o.__dict__ for o in obj_list])
-    if output.lower() in ['sqlite', 'both']:
-        conn = sqlite3.connect(cfg.SQLITE_FNAME)
-        df.to_sql('chainstate', conn, if_exists='append', index=False)
-        conn.commit()
-        conn.close()
-    if output.lower() in ['parquet', 'both']:
-        fp = Path(cfg.PARQUET_FNAME)
-        write(cfg.PARQUET_FNAME, df, compression='snappy', append=fp.is_file())
+    if not cfg.PARTITION: 
+        partition_by = 'script_type'
+    else:
+        df['no_partition'] = 'chainstate'
+        partition_by = 'no_partition'
+    for partition, gdf in df.groupby(partition_by):
+        if output.lower() in ['sqlite', 'both']:
+            f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{partition}.sqlite')
+            conn = sqlite3.connect(f)
+            del gdf['no_partition']
+            gdf.to_sql(f'{partition}', conn, if_exists='append', index=False)
+            conn.commit()
+            conn.close()
+        if output.lower() in ['parquet', 'both']:
+            f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{partition}.parquet')
+            del gdf['no_partition']
+            write(f, gdf, compression='snappy', append=f.is_file())
     
 
 def read_varint(buf, offset=0):

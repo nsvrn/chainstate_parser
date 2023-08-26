@@ -17,11 +17,11 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 - You can load it back in python/dataframes or use [SQLite browser](https://sqlitebrowser.org/) for sqlite to query
 
 #### Config.py
-> **Warning**: processing time: ~110M leveldb rows, parses at ~10-30k rows/second on a 3 year old laptop (depends on your machine)
+> **Warning**: processing time: ~110M leveldb rows, parses at ~10-30k rows/second on a 3 year old laptop (depends on the machine specs)
 - MAX_ROWS (int): set max rows to parse(useful for debugging to run quickly), set None to disable limit
 - OUTPUT_FORMAT (str): parquet/sqlite/both, file format of output db file. 
 - BATCH_SIZE (int): num of rows to append in batches to the output db, adjust accordingly if memory is not enough
-- 
+- PARTITION (bool) : set True to partition output db files by script_type, no partitioning if False
 
 
 

@@ -84,10 +84,16 @@ def dump_chainstate():
 
 def purge_old_output_files():
     logger.info('Purging old files...')
-    for fname in [cfg.PARQUET_FNAME, cfg.SQLITE_FNAME]:
+    for fname in [cfg.PARQUET_FOLDER, cfg.SQLITE_FOLDER]:
         f = Path(fname)
-        f.unlink(missing_ok=True)
+        if f.is_file(): 
+            f.unlink(missing_ok=True)
+        elif f.is_dir():
+            for dir_f in f.iterdir():
+                dir_f.unlink()
+            f.rmdir()
 
+    Path(cfg.PARQUET_FOLDER).mkdir()
 
 
 if __name__ == '__main__':
