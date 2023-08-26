@@ -17,15 +17,16 @@ def write_to_db(obj_list, output):
         df[nop] = '0'
         partition_by = nop
     for partition, gdf in df.groupby(partition_by):
+        fname = partition if cfg.PARTITION else 'chainstate'
         if output.lower() in ['sqlite', 'both']:
-            f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{partition}.sqlite')
+            f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{fname}.sqlite')
             conn = sqlite3.connect(f)
             if not cfg.PARTITION: del gdf[nop]
-            gdf.to_sql(f'{partition}', conn, if_exists='append', index=False)
+            gdf.to_sql(f'{fname}', conn, if_exists='append', index=False)
             conn.commit()
             conn.close()
         if output.lower() in ['parquet', 'both']:
-            f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{partition}.parquet')
+            f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{fname}.parquet')
             if not cfg.PARTITION: del gdf[nop]
             write(f, gdf, compression='snappy', append=f.is_file())
     
