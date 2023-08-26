@@ -1,0 +1,6 @@
+loguru
+plyvel
+pandas
+python-bitcoinlib
+base58
+tqdm

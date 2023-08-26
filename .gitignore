@@ -1,0 +1,4 @@
+**/chainstate
+**/__pycache__
+*.sqlite
+*.csv
