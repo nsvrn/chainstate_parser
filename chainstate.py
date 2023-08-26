@@ -92,8 +92,8 @@ def purge_old_output_files():
             for dir_f in f.iterdir():
                 dir_f.unlink()
             f.rmdir()
-
     Path(cfg.PARQUET_FOLDER).mkdir()
+    Path(cfg.SQLITE_FOLDER).mkdir()
 
 
 if __name__ == '__main__':
