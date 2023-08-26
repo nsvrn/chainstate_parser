@@ -13,7 +13,7 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 - Setup config.py settings (refer config section below)
 - Run `python chainstate.py`
 - The parsed data can be saved down to a single sqlite table or a single parquet file. 
-- For this parquet uses less than half the storage of sqlite much easier if you prefer to load entire utxo set in memory at once.
+- For this parquet with compression uses 50% of the storage of sqlite so much easier if you prefer to load entire utxo set in memory at once.
 - You can load it back in python/dataframes or use [SQLite browser](https://sqlitebrowser.org/) for sqlite to query
 
 #### Config.py

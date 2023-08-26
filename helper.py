@@ -17,7 +17,7 @@ def write_to_db(obj_list, output):
         conn.close()
     if output.lower() in ['parquet', 'both']:
         fp = Path(cfg.PARQUET_FNAME)
-        write(cfg.PARQUET_FNAME, df, append=fp.is_file())
+        write(cfg.PARQUET_FNAME, df, compression='snappy', append=fp.is_file())
     
 
 def read_varint(buf, offset=0):
