@@ -16,24 +16,25 @@ def write_to_db(obj_list, is_txids=False):
         df = DataFrame([o.__dict__ for o in obj_list])
     
     if is_partition: 
-        partition_by = 'height_batch'
-        df[partition_by] = (df['height']//25000 + 1).astype(str)
+        partition_by = 'height_bin'
     else:
         df['__x'] = 1
         partition_by = '__x'
     
     for partition, gdf in df.groupby(partition_by):
-        fname = f'height_p{partition.zfill(2)}' if is_partition else db_name
+        fname = partition if is_partition else db_name
         if cfg.OUTPUT_FORMAT.lower() in ['sqlite', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{fname}.sqlite')
             conn = sqlite3.connect(f)
             if partition_by in gdf.columns: del gdf[partition_by]
-            gdf.to_sql(f'{fname}', conn, if_exists='append', index=False)
+            if 'height_bin' in gdf.columns: del gdf['height_bin']
+            gdf.to_sql('chainstate', conn, if_exists='append', index=False)
             conn.commit()
             conn.close()
         if cfg.OUTPUT_FORMAT.lower() in ['parquet', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.PARQUET_FOLDER).joinpath(f'{fname}.parquet')
             if partition_by in gdf.columns: del gdf[partition_by]
+            if 'height_bin' in gdf.columns: del gdf['height_bin']
             write(f, gdf, compression='snappy', append=f.is_file())
     
 

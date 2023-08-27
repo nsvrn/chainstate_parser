@@ -14,6 +14,7 @@ class UTXO:
     else: tx_id: str
     vout: str
     height: int
+    height_bin: str
     is_coinbase: int
     amount: int # sats
     script_type: str
@@ -42,6 +43,31 @@ def deobfuscate(key, value):
         c = (int(v, base=16) ^ int(key[idx % len(key)], base=16))
         dv += f'{c:x}'
     return bytes.fromhex(dv)
+
+
+def ht_bin_tag(ht, prior, bin):
+    p = ((ht - prior)//bin) + 1
+    if (ht - prior) % bin == 0:
+        p -= 1
+    hb = f'upto_{int(((p*bin)+prior)/1000)}k'
+    return hb
+
+def height_bin(ht):
+    hb = ''
+    if ht <= 250000:
+        hb = 'upto_250k'
+    elif ht <= 325000:
+        hb = 'upto_325k'
+    elif ht <= 575000:
+        hb = ht_bin_tag(ht, 325000, 25000) 
+    elif ht <= 775000:
+        hb = ht_bin_tag(ht, 575000, 10000)
+    elif ht <= 800000:
+        hb = ht_bin_tag(ht, 775000, 3000)
+    else:
+        hb = ht_bin_tag(ht, 800000, 5000)
+    return hb
+
 
 
 def dump_chainstate():
@@ -76,8 +102,11 @@ def dump_chainstate():
             script_type, script_pubkey = script.decompress(nsize, d_value[offset:])  
             if tx_key is None: 
                 tx_key = txid_dict[tx_id] if cfg.NORMALIZATION else tx_id
-            utxo_set.append(UTXO(tx_key, vout, height, is_coinbase, amount, 
-                                    script_type, script_pubkey.__repr__()))
+            script_pk = script_pubkey.__repr__().replace('CScript', '')[1:][:-1]
+
+            utxo_set.append(UTXO(tx_key, vout, height, height_bin(height), 
+                                 is_coinbase, amount, script_type, 
+                                 script_pk))
             
             # batch db append:
             if len(utxo_set) % cfg.BATCH_SIZE == 0:
