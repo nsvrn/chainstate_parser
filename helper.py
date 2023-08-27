@@ -16,13 +16,14 @@ def write_to_db(obj_list, is_txids=False):
         df = DataFrame([o.__dict__ for o in obj_list])
     
     if is_partition: 
-        partition_by = 'script_type'
+        partition_by = 'height_batch'
+        df[partition_by] = (df['height']//25000 + 1).astype(str)
     else:
         df['__x'] = 1
         partition_by = '__x'
     
     for partition, gdf in df.groupby(partition_by):
-        fname = partition if is_partition else db_name
+        fname = f'height_p{partition.zfill(2)}' if is_partition else db_name
         if cfg.OUTPUT_FORMAT.lower() in ['sqlite', 'both']:
             f = Path(__file__).parents[0].joinpath(cfg.SQLITE_FOLDER).joinpath(f'{fname}.sqlite')
             conn = sqlite3.connect(f)

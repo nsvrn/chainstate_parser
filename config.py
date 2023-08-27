@@ -5,4 +5,4 @@ OUTPUT_FORMAT = 'both'
 MAX_ROWS = None
 BATCH_SIZE = int(5e6)       
 PARTITION = True              
-NORMALIZATION = False
+NORMALIZATION = False # TODO: fix memory usage issue

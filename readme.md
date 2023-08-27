@@ -20,9 +20,9 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 > **Warning**: processing time: ~110M leveldb rows, parses at ~10-30k rows/second on a 3 year old laptop (depends on the machine specs)
 - MAX_ROWS (int): set max rows to parse(useful for debugging to run quickly), set None to disable limit
 - OUTPUT_FORMAT (str): parquet/sqlite/both, file format of output db file. 
-- BATCH_SIZE (int): num of rows to append in batches to the output db, adjust accordingly if memory is not enough
-- PARTITION (bool) : set True to partition output db files by script_type, no partitioning if False
-- NORMALIZATION (bool) : set True to tag tx_ids as int with a lookup table, uses 40% less storage
+- BATCH_SIZE (int): num of rows to append/write in batches to the output db
+- PARTITION (bool): partitions output db files by block height(sorted batches of 25,000 blocks per partition)
+- NORMALIZATION (bool): tags tx_ids as int with a lookup table, uses 40% less storage
 
 
 
@@ -31,3 +31,4 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 - https://github.com/in3rsha/bitcoin-chainstate-parser
 - https://github.com/proger/utxo-dump
 - https://github.com/jimmysong/programmingbitcoin
+- https://discovery.ucl.ac.uk/id/eprint/10063357/1/utxo_analysis-v2.pdf
