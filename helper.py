@@ -11,7 +11,6 @@ def write_to_db(obj_list, is_txids=False):
     if is_txids: 
         is_partition = False
         db_name = 'txid'
-        obj_list.pop('NA', None)
         df = DataFrame(obj_list.items(), columns=['tx_id', 'txid_key'])
     else:
         df = DataFrame([o.__dict__ for o in obj_list])

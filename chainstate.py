@@ -49,14 +49,20 @@ def dump_chainstate():
     obf_key = get_obfuscation_key(db)
     idx = 0
     utxo_set = []
-    txid_dict = {'NA':0}
+    txid_dict = {}
+    txid_set = set({})
+    assigned_id = 0
     logger.info('Parsing in progress...')
     for key, value in tqdm(db.iterator()):
         if chr(key[0]) == 'C':
+            tx_key = None
             # parse key:
             tx_id = (key[1:33][::-1]).hex()
-            if cfg.NORMALIZATION and tx_id not in txid_dict:
-                txid_dict[tx_id] = max(txid_dict.values()) + 1
+            if cfg.NORMALIZATION and tx_id not in txid_set:
+                assigned_id += 1
+                txid_dict[tx_id] = assigned_id
+                txid_set.add(tx_id)
+                tx_key = assigned_id
             vout = hp.read_varint(key[33:])[0]
             
             # parse value:
@@ -67,8 +73,9 @@ def dump_chainstate():
             amount, offset = hp.read_varint(d_value, offset)
             amount = hp.txout_decompressamount(amount)
             nsize, offset = hp.read_varint(d_value, offset)
-            script_type, script_pubkey = script.decompress(nsize, d_value[offset:])   
-            tx_key = txid_dict[tx_id] if cfg.NORMALIZATION else tx_id
+            script_type, script_pubkey = script.decompress(nsize, d_value[offset:])  
+            if tx_key is None: 
+                tx_key = txid_dict[tx_id] if cfg.NORMALIZATION else tx_id
             utxo_set.append(UTXO(tx_key, vout, height, is_coinbase, amount, 
                                     script_type, script_pubkey.__repr__()))
             
@@ -108,5 +115,5 @@ if __name__ == '__main__':
 
     purge_old_output_files()
     dump_chainstate()
-    pass
+    
 
