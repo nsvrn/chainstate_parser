@@ -3,4 +3,4 @@
 *.sqlite
 *.csv
 *.parquet
-scratchpad.py
+scratchpad.*

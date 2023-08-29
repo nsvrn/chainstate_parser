@@ -22,9 +22,6 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 - OUTPUT_FORMAT (str): parquet/sqlite/both, file format of output db file. 
 - BATCH_SIZE (int): num of rows to append/write in batches to the output db
 - PARTITION (bool): partitions output db files by block height(keeps file sizes under 1GB)
-- NORMALIZATION (bool): tags tx_ids as int with a lookup table(implemented but has a memory usage issue that needs to be optimized, set False)
-
-
 
 ---
 #### References:
