@@ -37,7 +37,7 @@ def save_stats():
                         .rename(columns={'height':'num_outputs'}) \
                         .reset_index()
             hs_df = pd.concat([hs_df, sdf], ignore_index=True)
-    write_to_db(h_df, hs_df)
+    write_to_db(h_df.reset_index(), hs_df.reset_index())
 
 
 
