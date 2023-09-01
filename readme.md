@@ -3,13 +3,13 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 
 
 
-![alt screenshot](chainstate_screenshot.png)
+![alt screenshot](docs/chainstate_screenshot.png)
 
 #### Stats/visualization charts
 
 - Check this [notebook](/stats/stats.ipynb)
 
-![alt screenshot](num_txs_graph.png)
+![alt screenshot](docs/num_txs_graph.png)
 
 #### Setup
 - Required: >= python3.7
