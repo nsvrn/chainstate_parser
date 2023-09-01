@@ -8,6 +8,7 @@ Parses Bitcoin's LevelDB UTXO set (chainstate folder) and dumps to a flat sqlite
 #### Stats/visualization charts
 
 - Check this [notebook](/stats/stats.ipynb)
+
 ![alt screenshot](num_txs_graph.png)
 
 #### Setup
